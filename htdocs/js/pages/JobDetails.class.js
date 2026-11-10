@@ -212,10 +212,11 @@ Class.subclass(Page.Base, "Page.JobDetails", {
 		html += '<div class="subtitle" style="margin-top:7px; margin-bottom:13px;">';
 		html += 'Completed Job';
 
-		if (event.id && !event.multiplex) html += '<div class="subtitle_widget" style="margin-left:2px;"><span class="link" onMouseUp="$P().run_again()"><i class="fa fa-repeat">&nbsp;</i><b>Run Again</b></span></div>';
+		// Run Again - only for users with run_events privilege (editor, runner)
+		if (event.id && !event.multiplex && app.hasPrivilege('run_events')) html += '<div class="subtitle_widget" style="margin-left:2px;"><span class="link" onMouseUp="$P().run_again()"><i class="fa fa-repeat">&nbsp;</i><b>Run Again</b></span></div>';
 		let jumpToHist = `<div><a href="#History?sub=event_history&id=${event.id}"><i class="fa fa-arrow-circle-right">&nbsp;</i><b>Jump to History</b></a></div>`;
-		//adding edit button on job detail page
-		if (event.id) html += '<div class="subtitle_widget" style="margin-left:2px;"><a href="#Schedule?sub=edit_event&id=' + event.id + '" target="_self"><span class="link"><i class="fa fa-edit">&nbsp;</i><b>Edit</b></span></a></div>';
+		// Edit button - only for users with edit_events privilege (editor, admin)
+		if (event.id && app.hasPrivilege('edit_events')) html += '<div class="subtitle_widget" style="margin-left:2px;"><a href="#Schedule?sub=edit_event&id=' + event.id + '" target="_self"><span class="link"><i class="fa fa-edit">&nbsp;</i><b>Edit</b></span></a></div>';
 		if (app.isAdmin()) html += '<div class="subtitle_widget"><span class="link abort" onMouseUp="$P().delete_job()"><i class="fa fa-trash-o">&nbsp;</i><b>Delete Job</b></span></div>';
 		
 		html += '<div class="clear"></div>';
@@ -925,7 +926,11 @@ Class.subclass(Page.Base, "Page.JobDetails", {
 
 		html += '<div class="subtitle" style="margin-top:7px; margin-bottom:13px;">';
 		html += 'Live Job Progress';
+		// Abort Job - only for users with abort_events privilege (editor, admin)
+		// Abort Job - only for users with abort_events privilege (editor, admin)
+		if (app.hasPrivilege('abort_events')) {
 		html += '<div class="subtitle_widget" style="margin-left:2px;"><span class="link abort" onMouseUp="$P().abort_job()"><i class="fa fa-ban">&nbsp;</i><b>Abort Job</b></span></div>';
+		}
 		html += '<div class="subtitle_widget"><span id="s_watch_job" class="link" onMouseUp="$P().toggle_watch()" style="' + (watch_enabled ? 'color:#3f7ed5;' : 'color:#777;') + '"><i class="fa ' + (watch_enabled ? 'fa-check-square-o' : 'fa-square-o') + '">&nbsp;</i><b>Watch Job</b></span></div>';
 		html += '<div class="clear"></div>';
 		html += '</div>';

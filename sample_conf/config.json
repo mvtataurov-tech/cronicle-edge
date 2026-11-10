@@ -62,7 +62,8 @@
 			{ "id": "run_events", "title": "Run Events" },
 			{ "id": "abort_events", "title": "Abort Events" },
 			{ "id": "state_update", "title": "Toggle Scheduler" },
-			{ "id": "disable_enable_events", "title": "Disable/Enable Events" }
+			{ "id": "disable_enable_events", "title": "Disable/Enable Events" },
+		{ "id": "reader", "title": "Reader (только просмотр)" }
 		],
 		"new_event_template": { 
 			"enabled": 1, 
@@ -192,7 +193,8 @@
 			"run_events": 0,
 			"abort_events": 0,
 			"state_update": 0,
-			"disable_enable_events": 0
+			"disable_enable_events": 0,
+			"reader": 0
 		}
 	}
 	

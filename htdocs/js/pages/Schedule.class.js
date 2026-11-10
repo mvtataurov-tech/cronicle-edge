@@ -909,23 +909,37 @@ Class.subclass(Page.Base, "Page.Schedule", {
 			var edit_url = '#Schedule?sub=edit_event&id=' + encodeURIComponent(item.id);
 
 			if (isGrid) {
-				actions = [
-					'<span class="link event-action" onMouseUp="$P().run_event(' + idx + ',event)"><b>run |</b></span>',
-					`<span class="link event-action" onMouseUp="Nav.go('#History?sub=event_history&id=${item.id}')"><b>history |</b></span>`,
-					'<span class="link event-action" onMouseUp="$P().delete_event(' + idx + ')"><b> delete</b></span>'
-				]
+				actions = [];
+				// History link always visible for all users
+				actions.push(`<span class="link event-action" onMouseUp="Nav.go('#History?sub=event_history&id=${item.id}')"><b>history |</b></span>`);
+				// Run button - only for users with run_events privilege (editor, runner)
+				if (app.hasPrivilege('run_events')) {
+					actions.push('<span class="link event-action" onMouseUp="$P().run_event(' + idx + ',event)"><b>run |</b></span>');
+				}
+				// Delete button - only for users with delete_events privilege (editor, admin)
+				if (app.hasPrivilege('delete_events')) {
+					actions.push('<span class="link event-action" onMouseUp="$P().delete_event(' + idx + ')"><b> delete</b></span>');
+				}
 
 			}
 			else {
-				actions = [
-					'<span class="link" onMouseUp="$P().run_event(' + idx + ',event, true)"><b>Start</b></span>',
-					'<span class="link" onMouseUp="$P().run_event(' + idx + ',event)"><b>Run</b></span>',
-					'<a href="' + edit_url + '"><b>Edit</b></a>',
-					'<a href="#History?sub=event_stats&id=' + item.id + '"><b>Stats</b></a>',
-					'<a href="#History?sub=event_history&id=' + item.id + '"><b>History</b></a>',
-					'<span class="link" onMouseUp="$P().delete_event(' + idx + ')"><b>Delete</b></span>',
-					// '<span class="link" onMouseUp="$P().delete_event('+idx+')"><b>Delete</b></span>'
-				];
+				actions = [];
+				// Start/Run buttons - only for users with run_events privilege (editor, runner)
+				if (app.hasPrivilege('run_events')) {
+					actions.push('<span class="link" onMouseUp="$P().run_event(' + idx + ',event, true)"><b>Start</b></span>');
+					actions.push('<span class="link" onMouseUp="$P().run_event(' + idx + ',event)"><b>Run</b></span>');
+				}
+				// Edit button - only for users with edit_events privilege (editor, admin)
+				if (app.hasPrivilege('edit_events')) {
+					actions.push('<a href="' + edit_url + '"><b>Edit</b></a>');
+				}
+				// Stats/History always visible for all users
+				actions.push('<a href="#History?sub=event_stats&id=' + item.id + '"><b>Stats</b></a>');
+				actions.push('<a href="#History?sub=event_history&id=' + item.id + '"><b>History</b></a>');
+				// Delete button - only for users with delete_events privilege (editor, admin)
+				if (app.hasPrivilege('delete_events')) {
+					actions.push('<span class="link" onMouseUp="$P().delete_event(' + idx + ')"><b>Delete</b></span>');
+				}
 			}
 
 			var cat = item.category ? find_object(app.categories, { id: item.category }) : null;
@@ -1760,7 +1774,8 @@ Class.subclass(Page.Base, "Page.Schedule", {
 			html += '<td width="30">&nbsp;</td><td><div class="button" style="width:110px; font-weight:normal;" onMouseUp="$P().run_event_from_edit(event)">Run Now</div></td>';
 		}
 
-		// save
+		// save - only for users with edit_events privilege (editor, admin)
+		if (app.hasPrivilege('edit_events')) {
 		html += `
 		<td width="30">&nbsp;</td>
 		<td><div class="button" style="width:130px;" onMouseUp="$P().do_save_event()"><i class="fa fa-floppy-o">&nbsp;&nbsp;</i>Save Changes</div></td>
@@ -1770,7 +1785,8 @@ Class.subclass(Page.Base, "Page.Schedule", {
 		</center>
 		</div>
 		</div>
-		`
+		`;
+		}
 
 		this.div.html(html);
 		this.setScriptEditor()
